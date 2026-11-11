@@ -1,57 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rubik's cube scanner</title>
-  <link rel="stylesheet" href="css/output.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rubik's cube scanner</title>
+    <link rel="stylesheet" href="css/output.css">
 </head>
 
 <body class="bg-rose-50 text-stone-900 min-h-screen">
-  <header class="max-w-6xl mx-auto px-4 pt-8 pb-4">
-    <h1 class="text-2xl text-yellow-950 font-vampiro">Scan your cube</h1>
-    <p class="text-yellow-950 mt-1 font-poppins">
-      Upload one photo per face. <br> Click the four corners of the face in the photo
-      and the app straightens it.
-    </p>
-  </header>
+    <header class="max-w-6xl mx-auto px-4 pt-8 pb-4">
+        <h1 class="text-2xl text-yellow-950 font-vampiro">Scan your cube</h1>
+        <p class="text-yellow-950 mt-1 font-poppins">
+            Upload one photo per face. <br> Click the four corners of the face in the photo
+            and the app straightens it.
+        </p>
+    </header>
 
-  <main class="max-w-6xl mx-auto px-4 pb-10 grid gap-6 lg:grid-cols-[190px_1fr_300px]">
-    <nav id="faces" aria-label="Cube faces" class="flex lg:flex-col gap-2 overflow-x-auto">
-      <button class="face-btn is-active">
-        <span class="h-9 w-9 shrink-0 rounded-md border-2 border-gray-200"></span>
-        <span>
-          <span class="block font-poppins text-yellow-950">Up</span>
-          <span class="block text-xs font-poppins text-stone-500">No photo</span>
-        </span>
-      </button>
-    </nav>
+    <main class="max-w-6xl mx-auto px-4 pb-10 grid gap-6 lg:grid-cols-[190px_1fr_300px]">
+        <nav id="faces" aria-label="Cube faces" class="flex lg:flex-col gap-2 overflow-x-auto"></nav>
 
-    <section>
-      <div class="flex flex-wrap items-center gap-2 mb-3">
-        <button id="pick" class="btn-dark">Choose photo</button>
-        <button id="reset" class="btn-light">Reset corners</button>
-        <input id="file" type="file" accept="image/*" class="hidden">
-      </div>
+        <section>
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <button id="pick" class="btn-dark">Choose photo</button>
+                <button id="reset" class="btn-light">Reset corners</button>
+                <input id="file" type="file" accept="image/*" class="hidden">
+                <p id="hint" class="text-sm text-yellow-950 font-poppins"></p>
+            </div>
 
-      <div id="stage" class="rounded-md border border-dashed border-stone-300 bg-white min-h-80 flex items-center justify-center">
-        <canvas id="editor" class="max-w-full touch-none cursor-crosshair hidden"></canvas>
-        <p id="empty" class="text-stone-500 font-poppins text-sm p-6 text-center">No photo for this face yet.</p>
-      </div>
-    </section>
+            <div id="stage"
+                class="rounded-md border border-dashed border-stone-300 bg-white min-h-80 flex items-center justify-center">
+                <canvas id="editor" class="max-w-full touch-none cursor-crosshair hidden"></canvas>
+                <p id="empty" class="text-stone-500 font-poppins text-sm p-6 text-center">No photo for this face yet.
+                </p>
+            </div>
+        </section>
 
-    <aside>
-      <h2 class="font-vampiro text-xl mb-2 text-yellow-950">Straightened face</h2>
-      <canvas id="out" width="300" height="300" class="w-full max-w-75 rounded-md border border-stone-200 bg-white"></canvas>
-    </aside>
-  </main>
+        <aside>
+            <h2 class="font-vampiro text-xl mb-2 text-yellow-950">Straightened face</h2>
+            <canvas id="out" width="300" height="300"
+                class="w-full max-w-75 rounded-md border border-stone-200 bg-white"></canvas>
+        </aside>
+    </main>
 
-  <footer class="max-w-6xl mx-auto px-4 pb-12">
-    <button id="send" class="btn-go" disabled>Detect colours</button>
-    <span id="status" class="ml-3 text-sm text-stone-600" role="status"></span>
-  </footer>
+    <footer class="max-w-6xl mx-auto px-4 pb-12">
+        <button id="send" class="btn-go" disabled>Detect colours</button>
+        <span id="status" class="ml-3 text-sm text-stone-600" role="status"></span>
+    </footer>
 
-  <script src="js/warp.js"></script>
-  <script src="js/app.js"></script>
+    <script src="js/warp.js"></script>
+    <script src="js/app.js"></script>
 </body>
+
 </html>
