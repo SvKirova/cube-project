@@ -303,4 +303,25 @@ function drawGridLines() {
     }
 }
 
+sendButton.addEventListener("click", async function () {
+    statusText.textContent = "Sending...";
+    const formData = new FormData();
+
+    for (const face of FACES) {
+        const blob = await (await fetch(faceData[face.id].straightenedUrl)).blob();
+        formData.append(face.id, blob, face.id + ".png");
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/extract-colors", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        statusText.textContent = "Could not reach the backend";
+    }
+});
+
 selectFace("U");
