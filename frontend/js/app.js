@@ -100,8 +100,8 @@ function selectFace(faceId) {
 }
 
 chooseButton.addEventListener("click", function () {
-        fileInput.click();
-    });
+    fileInput.click();
+});
 
 fileInput.addEventListener("change", function (event) {
     const file = event.target.files[0];
@@ -230,7 +230,7 @@ function mousePositionInPhoto(event) {
 editorCanvas.addEventListener("pointerdown", function (event) {
     const face = faceData[activeFaceId];
     const mouse = mousePositionInPhoto(event);
-    const grabDistance = 16 / editorScale(); 
+    const grabDistance = 16 / editorScale();
 
     draggedCornerIndex = -1;
     face.corners.forEach(function (corner, i) {
@@ -303,25 +303,69 @@ function drawGridLines() {
     }
 }
 
-sendButton.addEventListener("click", async function () {
-    statusText.textContent = "Sending...";
-    const formData = new FormData();
+const API_URL = "http://127.0.0.1:8000";
 
-    for (const face of FACES) {
-        const blob = await (await fetch(faceData[face.id].straightenedUrl)).blob();
-        formData.append(face.id, blob, face.id + ".png");
-    }
+sendButton.addEventListener("click", async function () {
+    sendButton.disabled = true;
+    statusText.textContent = "Extracting colors...";
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/extract-colors", {
-            method: "POST",
-            body: formData,
-        });
+        const formData = new FormData();
+        for (const face of FACES) {
+
+            const blob = await (
+                await fetch(faceData[face.id].straightenedUrl)
+            ).blob();
+
+            formData.append(face.id, blob, face.id + ".png");
+        }
+
+        const response = await fetch(
+            API_URL + "/extract-colors",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
         const data = await response.json();
-        console.log(data);
+        if (!response.ok) {
+            throw new Error(data.detail || "Color extraction failed");
+        }
+
+        statusText.textContent = "Solving the cube...";
+        const solveResponse = await fetch(
+            API_URL + "/solve",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+        );
+
+        const result = await solveResponse.json();
+
+        if (!solveResponse.ok) {
+            throw new Error(result.detail || "Could not solve the cube");
+        }
+        showSolution(result.moves);
     } catch (error) {
-        statusText.textContent = "Could not reach the backend";
+        statusText.textContent = error.message;
+    } finally {
+        sendButton.disabled = false;
     }
 });
+
+function showSolution(moves) {
+    if (moves.length === 0) {
+        statusText.textContent = "The cube is already solved!";
+        return;
+    }
+    statusText.textContent =
+        "Solution (" + moves.length + " moves): " +
+        moves.join(" ");
+}
 
 selectFace("U");

@@ -4,6 +4,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from color_detection import extract_sticker_colors
+from cube_solver import solve_cube_state
 
 app = FastAPI(title="Rubik's Cube Scanner API")
 
@@ -14,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 async def read_face(upload: UploadFile, face_id: str):
     data = await upload.read()
     image = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
@@ -22,11 +22,9 @@ async def read_face(upload: UploadFile, face_id: str):
         raise HTTPException(status_code=400, detail=f"Face {face_id}: not a valid image")
     return image
 
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
 
 @app.post("/extract-colors")
 async def extract_colors(
@@ -42,4 +40,26 @@ async def extract_colors(
     for face_id, upload in faces.items():
         image = await read_face(upload, face_id)
         result[face_id] = extract_sticker_colors(image)
-    return {"colors": result}  # raw RGB only; classification comes later
+    return {"colors": result}
+
+@app.post("/solve")
+async def solve(payload: dict):
+    colors = payload.get("colors")
+    if not colors:
+        raise HTTPException(
+            status_code=400,
+            detail="No cube colors provided"
+        )
+
+    try:
+        moves = solve_cube_state(colors)
+
+        return {
+            "moves": moves
+        }
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
